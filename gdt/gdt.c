@@ -1,4 +1,5 @@
 #include "gdt.h"
+#include "../vga.h"
 #include "../util.h"
 
 extern void gdt_flush(uint32_t addr);
@@ -17,7 +18,7 @@ void initGdt() {
     setGdtEntry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);  // kernel code segment
     setGdtEntry(2, 0, 0xFFFFFFFF, 0x92, 0xCF);  // kernel data segment
     setGdtEntry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);  // user code segment
-    setGdtEntry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);  // user code segment
+    setGdtEntry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);  // user data segment
     writeTSS(5, 0x10, 0x0);
     gdt_flush((uint32_t)&gdt_ptr);
     tss_flush();

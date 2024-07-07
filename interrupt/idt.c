@@ -1,4 +1,5 @@
 #include "idt.h"
+#include "../vga.h"
 
 #define PIC_MASTER_COM 0x20
 #define PIC_MASTER_DATA 0x21
@@ -96,7 +97,7 @@ void initIdt() {
     setIdtEntry(177, (uint32_t)isr177, 0x08, 0x8E);
     
     idt_flush((uint32_t)&idt_ptr);
-    print("Interrupt descriptor table setup done\n");
+    print("Intrrupt descriptor table setup done\n");
 };
 
 void setIdtEntry(uint8_t num, uint32_t base, uint16_t selector, uint8_t flags) {
@@ -144,14 +145,62 @@ char* messages[] = {
     "reserved",
     "reserved"
 };
+const uint32_t UNKNOWN = 'U';
+const uint32_t ESC = 'U';
+const uint32_t LSHFT = 'U';
+const uint32_t RSHFT = 'U';
+const uint32_t CTRL = 'U';
+const uint32_t ALT = 'U';
+const uint32_t CAPS = 'U';
+const uint32_t F1 = 'U';
+const uint32_t F2 = 'U';
+const uint32_t F3 = 'U';
+const uint32_t F4 = 'U';
+const uint32_t F5 = 'U';
+const uint32_t F6 = 'U';
+const uint32_t F7 = 'U';
+const uint32_t F8 = 'U';
+const uint32_t F9 = 'U';
+const uint32_t F10 = 'U';
+const uint32_t F11 = 'U';
+const uint32_t F12 = 'U';
+const uint32_t NUMLCK = 'U';
+const uint32_t SCRLCK = 'U';
+const uint32_t HOME = 'U';
+const uint32_t UP = 'U';
+const uint32_t PGUP = 'U';
+const uint32_t LEFT = 'U';
+const uint32_t RIGHT = 'U';
+const uint32_t END = 'U';
+const uint32_t DOWN = 'U';
+const uint32_t PGDOWN = 'U';
+const uint32_t INS = 'U';
+const uint32_t DEL = 'U';
+
+const char scan_code_array[128] = {
+UNKNOWN,ESC,'1','2','3','4','5','6','7','8',
+'9','0','-','=','\b','\t','q','w','e','r',
+'t','y','u','i','o','p','[',']','\n',CTRL,
+'a','s','d','f','g','h','j','k','l',';',
+'\'','`',LSHFT,'\\','z','x','c','v','b','n','m',',',
+'.','/',RSHFT,'*',ALT,' ',CAPS,F1,F2,F3,F4,F5,F6,F7,F8,F9,F10,NUMLCK,SCRLCK,HOME,UP,PGUP,'-',LEFT,UNKNOWN,RIGHT,
+'+',END,DOWN,PGDOWN,INS,DEL,UNKNOWN,UNKNOWN,UNKNOWN,F11,F12,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
+UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
+UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
+UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN
+};
 
 void isr_handler(struct interrupt_registers* regs){
     if (regs->int_no < 32) {
         print(messages[regs->int_no]);
 
     } else if (regs->int_no == 33)  {
-        int inp = inPortB(0x60) & 0x7F;
-        print("keybr interrupt\n");
+        uint16_t key_code = inPortB(0x60) & 0x7F;
+        uint8_t released = (inPortB(0x60) & 0x80) >> 7;
+        char s[] = {scan_code_array[key_code], '\0'};
+
+        if (!released)
+            print(s);
     }
     if (regs->int_no >=32) {
         outPortB(0x20, 0x20);
