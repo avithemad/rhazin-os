@@ -1,6 +1,9 @@
 #include "vga.h"
 #include <stdint.h>
 #include <stddef.h>
+#include "stdlib/stdio.h"
+
+static uint32_t* buffer_address;
 
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
@@ -59,20 +62,20 @@ static void putentryat(char c, size_t x, size_t y) {
     buffer[VGA_WIDTH*x + y] = vga_entry(c, color);
 }
 
-static void putchar(char c) {
-    if (row == VGA_HEIGHT) {
-        row = 0;
-        clear_screen(); 
-    }
+void putchar(char c) {
     if (c == '\n'){
         column = 0;
         row++;
-        return;
+    } else {
+        putentryat(c, row, column);
+        column = (column + 1)%VGA_WIDTH;
+        if (column == 0) {
+            row++;
+        }
     }
-    putentryat(c, row, column);
-    column = (column + 1)%VGA_WIDTH;
-    if (column == 0) {
-        row++;
+    if (row == VGA_HEIGHT) {
+        row = 0;
+        clear_screen(); 
     }
 }
 
@@ -86,9 +89,22 @@ void init_screen() {
     screen_init();
 }
 
-void print(const char* string, ...) {
+void print(const char* string) {
     int size = strlen(string);
     for (int i=0; i<size-1; i++) {
         putchar(string[i]);
+    }
+}
+
+void init_framebuffer(uint32_t* addr) {
+    buffer_address = addr;
+    for (int i=0; i<640; i++) {
+		buffer_address[i*1024 + i] = 0xFF0FFF;
+    }
+}
+
+void draw() {
+    for (int i=0; i<200; i++) {
+        buffer_address[i*300 + i] = 0xFF0000;
     }
 }

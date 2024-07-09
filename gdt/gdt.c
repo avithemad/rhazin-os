@@ -22,7 +22,6 @@ void initGdt() {
     writeTSS(5, 0x10, 0x0);
     gdt_flush((uint32_t)&gdt_ptr);
     tss_flush();
-    print("Global descriptor table setup done!\n");
 }
 
 void writeTSS(uint32_t num, uint16_t ss0, uint32_t esp0){

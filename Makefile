@@ -6,10 +6,11 @@ kernel:
 	${CROSS_COMPILER_PATH}/i686-elf-gcc -c interrupt/idt.c -o idt.o $(CFLAGS) 
 	${CROSS_COMPILER_PATH}/i686-elf-gcc -c gdt/gdt.c -o gdt.o $(CFLAGS) 
 	${CROSS_COMPILER_PATH}/i686-elf-gcc -c vga.c -o vga.o $(CFLAGS) 
+	${CROSS_COMPILER_PATH}/i686-elf-gcc -c stdlib/stdio.c -o stdio.o $(CFLAGS) 
 	nasm -f elf32 interrupt/idt.s -o idts.o
 	nasm -f elf32 gdt/gdt.s -o gdts.o
 	${CROSS_COMPILER_PATH}/i686-elf-gcc -T linker.ld -o myos.bin -ffreestanding -O2 -nostdlib \
-		boot.o kernel.o util.o idt.o idts.o gdt.o gdts.o vga.o -lgcc
+		boot.o kernel.o util.o idt.o idts.o gdt.o gdts.o vga.o stdio.o -lgcc
 	mkdir -p build/boot/grub
 	cp myos.bin build/boot/myos.bin
 	cp grub.cfg build/boot/grub/grub.cfg
@@ -20,4 +21,4 @@ clean:
 	rm -rf build
 
 run:
-	qemu-system-i386 -kernel myos.bin
+	qemu-system-i386  myos.iso

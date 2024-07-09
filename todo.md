@@ -18,6 +18,9 @@ find a better abstraction to do such things?
 
 1. Add a good terminal support to print your characters and manage the video buffer.
 2. Figure out keycodes for the keyboard and add typing support
+    -> add formatted printing of int, hex, char, string and float
+    -> add support for backspace and tabs
+    -> add support for caps lock and shift key
 3. Implement paging in order to manage memory
 4. Check what features the multiboot provides.
 5. How to do a multithreading
