@@ -4,7 +4,7 @@
 #include "util.h"
 #include "interrupt/idt.h"
 #include "gdt/gdt.h"
-#include "screen/framebuffer.h"
+#include "vga/vga_text.h"
 #include "stdlib/stdio.h"
 #include "multiboot.h"
 
@@ -18,27 +18,31 @@
 #error "This tutorial needs to be compiled with a ix86-elf compiler"
 #endif
 
-
-uint32_t* ba;
+extern void _start();
 void kernel_main(unsigned long magic, unsigned long addr) 
 {
 	struct multiboot_info* info = (struct multiboot_info*)addr;
-	uint32_t* buffer = (uint32_t*)info->framebuffer_addr;
-	init_screen(buffer, info->framebuffer_width, info->framebuffer_height);
-	printf("hello there\n");
+	uint16_t* buffer = (uint16_t*)info->framebuffer_addr;
+	init_screen(buffer);
+	printf("Welcome to rhazin OS\n");
+	// init_screen(buffer, info->framebuffer_width, info->framebuffer_height);
 	initGdt();
 	initIdt();
-	/* Initialize terminal interface */
-	// TODO: check for the magic number
 	if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
-		// printf("Magic number is invalid\n");
+		printf("Magic number is invalid\n");
 		return;
-	} else {
-		// printf("Magic number is valid: %x\n", magic);
+	} 
+	// get the memory maps
+	uint32_t mmp_len = info->mmap_length;
+
+	for (int i=0; i < mmp_len; i+=sizeof(struct multiboot_mmap_entry)) {
+		struct multiboot_mmap_entry* mmap_entry = 
+			(struct multiboot_mmap_entry*)(info->mmap_addr + i);
+
+		printf("adr_low: %x, adr_high: %x\n", mmap_entry->addr_low, mmap_entry->addr_high);
+		printf(" len_low: %x. len_high: %x\n\n", mmap_entry->len_low, mmap_entry->len_high);
 	}
-	// obtaining the video information here
-	// printf("Framebuffer information : %x\n", info->framebuffer_addr);
-	// printf("Flags: %x\n", info->flags);
+	printf("_start addr: %x", &_start);
 
 	for (;;);
 	return;

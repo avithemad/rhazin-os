@@ -1,9 +1,7 @@
-#include "vga.h"
+#include "vga_text.h"
 #include <stdint.h>
 #include <stddef.h>
-#include "stdlib/stdio.h"
-
-static uint32_t* buffer_address;
+#include "../stdlib/stdio.h"
 
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
@@ -33,7 +31,7 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color)
 	return (uint16_t) uc | (uint16_t) color << 8;
 }
 static const size_t VGA_WIDTH = 80;
-static const size_t VGA_HEIGHT = 25;
+static const size_t VGA_HEIGHT = 24;
 
 static size_t row, column;
 static int8_t color;
@@ -47,19 +45,22 @@ static void clear_screen() {
     }
 }
 
-static void screen_init(void) {
+static void putentryat(char c, size_t x, size_t y) {
+    buffer[VGA_WIDTH*x + y] = vga_entry(c, color);
+}
+
+void init_screen(uint16_t* buffer_address) {
     row = 0;
     column = 0;
     color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-    buffer = (uint16_t*)0xB8000;
-    uint16_t* temp = (uint16_t*)0xA8000;
-    temp[0] = 32;
+    buffer = buffer_address;
     clear_screen();
 }
-
-
-static void putentryat(char c, size_t x, size_t y) {
-    buffer[VGA_WIDTH*x + y] = vga_entry(c, color);
+//TODO: make this shared in standard library
+static int strlen(const char* string) {
+    int res=0;
+    for (; string[res++]!='\0';);
+    return res;
 }
 
 void putchar(char c) {
@@ -79,32 +80,10 @@ void putchar(char c) {
     }
 }
 
-static int strlen(const char* string) {
-    int res=0;
-    for (; string[res++]!='\0';);
-    return res;
-}
-
-void init_screen() {
-    screen_init();
-}
 
 void print(const char* string) {
     int size = strlen(string);
     for (int i=0; i<size-1; i++) {
         putchar(string[i]);
-    }
-}
-
-void init_framebuffer(uint32_t* addr) {
-    buffer_address = addr;
-    for (int i=0; i<640; i++) {
-		buffer_address[i*1024 + i] = 0xFF0FFF;
-    }
-}
-
-void draw() {
-    for (int i=0; i<200; i++) {
-        buffer_address[i*300 + i] = 0xFF0000;
     }
 }

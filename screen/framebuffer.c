@@ -13,7 +13,7 @@ void init_screen(uint32_t* fb_addr, uint32_t w, uint32_t h) {
     height = h;
     width = w;
     for (int i=0; i<h*w; i++) {
-        fb_addr[i] = 0x000000;
+        fb_addr[i] = 0x000ff0;
     }
 }
 

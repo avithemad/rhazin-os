@@ -1,6 +1,6 @@
 #include "stdio.h"
 #include <stdarg.h>
-#include "../screen/framebuffer.h"
+#include "../vga/vga_text.h"
 
 static void pi_rec(int value) {
 	// if we have reached the end, the keep popping the stack and print
@@ -18,12 +18,19 @@ static void printInt(int value) {
 	else pi_rec(value);
 }
 static void printHex(int value) {
-	char hex[] = "0x00000000";
+	char hex[] = "00000000";
+	if (value < 0) {
+		for (int i=0; i<8; i++) {
+			hex[i] = 'F';
+		}
+	}
 	int i=0;
-	while(value!=0) {
+	int orig = value;
+	while((value!=0 && orig >=0) || 
+			(orig < 0 && value!=-1)) {
 		int single = value & 0xF;
-		if (single < 10) hex[9-i] = single + '0';
-		else hex[9-i] = single - 10 + 'A';
+		if (single < 10) hex[7-i] = single + '0';
+		else hex[7-i] = single - 10 + 'A';
 		i++;
 		value = value >> 4;
 	}

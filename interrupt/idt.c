@@ -1,5 +1,5 @@
 #include "idt.h"
-#include "../screen/framebuffer.h"
+#include "../stdlib/stdio.h"
 
 #define PIC_MASTER_COM 0x20
 #define PIC_MASTER_DATA 0x21
@@ -97,7 +97,6 @@ void initIdt() {
     setIdtEntry(177, (uint32_t)isr177, 0x08, 0x8E);
     
     idt_flush((uint32_t)&idt_ptr);
-    print("Idt setup done!");
 };
 
 void setIdtEntry(uint8_t num, uint32_t base, uint16_t selector, uint8_t flags) {
@@ -176,7 +175,6 @@ const uint32_t DOWN = 'U';
 const uint32_t PGDOWN = 'U';
 const uint32_t INS = 'U';
 const uint32_t DEL = 'U';
-
 const char scan_code_array[128] = {
 UNKNOWN,ESC,'1','2','3','4','5','6','7','8',
 '9','0','-','=','\b','\t','q','w','e','r',
@@ -191,14 +189,14 @@ UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN
 };
 void isr_handler(struct interrupt_registers* regs){
     if (regs->int_no < 32) {
-        print(messages[regs->int_no]);
+        printf(messages[regs->int_no]);
 
     } else if (regs->int_no == 33)  {
         uint16_t key_code = inPortB(0x60) & 0x7F;
         uint8_t released = (inPortB(0x60) & 0x80) >> 7;
         char s[] = {scan_code_array[key_code], '\0'};
         if (!released)
-            putchar(s[0]);
+            printf(s);
     }
     if (regs->int_no >=32) {
         outPortB(0x20, 0x20);
