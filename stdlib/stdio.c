@@ -1,6 +1,6 @@
 #include "stdio.h"
 #include <stdarg.h>
-#include "../vga.h"
+#include "../screen/framebuffer.h"
 
 static void pi_rec(int value) {
 	// if we have reached the end, the keep popping the stack and print

@@ -5,6 +5,4 @@
 void init_screen();
 void print(const char* string);
 void putchar(char c);
-void init_framebuffer(uint32_t* addr);
-void draw();
 #endif

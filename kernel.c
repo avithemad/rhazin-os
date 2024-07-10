@@ -4,7 +4,7 @@
 #include "util.h"
 #include "interrupt/idt.h"
 #include "gdt/gdt.h"
-#include "vga.h"
+#include "screen/framebuffer.h"
 #include "stdlib/stdio.h"
 #include "multiboot.h"
 
@@ -18,32 +18,27 @@
 #error "This tutorial needs to be compiled with a ix86-elf compiler"
 #endif
 
-extern void _start();
 
 uint32_t* ba;
 void kernel_main(unsigned long magic, unsigned long addr) 
 {
 	struct multiboot_info* info = (struct multiboot_info*)addr;
 	uint32_t* buffer = (uint32_t*)info->framebuffer_addr;
-	ba = buffer;
-	init_framebuffer(buffer);
+	init_screen(buffer, info->framebuffer_width, info->framebuffer_height);
+	printf("hello there\n");
 	initGdt();
 	initIdt();
-	for(;;);
-	return;
-	init_screen();
-	printf("hello there\n");
 	/* Initialize terminal interface */
 	// TODO: check for the magic number
 	if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
-		printf("Magic number is invalid\n");
+		// printf("Magic number is invalid\n");
 		return;
 	} else {
-		printf("Magic number is valid: %x\n", magic);
+		// printf("Magic number is valid: %x\n", magic);
 	}
 	// obtaining the video information here
-	printf("Framebuffer information : %x\n", info->framebuffer_addr);
-	printf("Flags: %x\n", info->flags);
+	// printf("Framebuffer information : %x\n", info->framebuffer_addr);
+	// printf("Flags: %x\n", info->flags);
 
 	for (;;);
 	return;

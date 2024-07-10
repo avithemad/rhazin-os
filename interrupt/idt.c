@@ -1,5 +1,5 @@
 #include "idt.h"
-#include "../vga.h"
+#include "../screen/framebuffer.h"
 
 #define PIC_MASTER_COM 0x20
 #define PIC_MASTER_DATA 0x21
@@ -97,6 +97,7 @@ void initIdt() {
     setIdtEntry(177, (uint32_t)isr177, 0x08, 0x8E);
     
     idt_flush((uint32_t)&idt_ptr);
+    print("Idt setup done!");
 };
 
 void setIdtEntry(uint8_t num, uint32_t base, uint16_t selector, uint8_t flags) {
@@ -188,7 +189,6 @@ UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
 UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,
 UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN
 };
-extern uint32_t* ba;
 void isr_handler(struct interrupt_registers* regs){
     if (regs->int_no < 32) {
         print(messages[regs->int_no]);
@@ -197,9 +197,8 @@ void isr_handler(struct interrupt_registers* regs){
         uint16_t key_code = inPortB(0x60) & 0x7F;
         uint8_t released = (inPortB(0x60) & 0x80) >> 7;
         char s[] = {scan_code_array[key_code], '\0'};
-        ba[key_code] = 0x00FF00;
         if (!released)
-            print(s);
+            putchar(s[0]);
     }
     if (regs->int_no >=32) {
         outPortB(0x20, 0x20);

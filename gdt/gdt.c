@@ -1,6 +1,6 @@
 #include "gdt.h"
-#include "../vga.h"
 #include "../util.h"
+#include "../screen/framebuffer.h"
 
 extern void gdt_flush(uint32_t addr);
 extern void tss_flush();
@@ -22,6 +22,7 @@ void initGdt() {
     writeTSS(5, 0x10, 0x0);
     gdt_flush((uint32_t)&gdt_ptr);
     tss_flush();
+    print("Gdt setup done");
 }
 
 void writeTSS(uint32_t num, uint16_t ss0, uint32_t esp0){
