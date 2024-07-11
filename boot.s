@@ -43,6 +43,7 @@ _start:
 
 	// now actually enable the paging by setting a few control registers
 	mov %cr4, %ecx
+	// setting the PSE bit in order to first enable 4 MB paging.
 	or $0x10, %ecx
 	mov %ecx, %cr4
 
@@ -54,6 +55,7 @@ _start:
 
 
 .section .text
+.global higher_half
 higher_half:
 	mov $stack_top, %esp
 	pushl %ebx // multiboot structure
@@ -68,15 +70,16 @@ higher_half:
 .align 4096
 .global initial_page_dir
 initial_page_dir:
+	// this is for the lower addressing initially
 	.long 0b10000011
 	.rept 767
 		.long 0
 	.endr
 
+	// the kernel maps from C0201000 - C020A8E0
+	// the first 10 bits of this address are the index into this page directory
+	// therefore enabling the first 4MB page also in this case.
 	.long (0 << 22) | 0b10000011
-	.long (1 << 22) | 0b10000011
-	.long (2 << 22) | 0b10000011
-	.long (3 << 22) | 0b10000011
 	.rept 252
 		.long 0
 	.endr

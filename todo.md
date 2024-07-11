@@ -34,3 +34,13 @@ find a better abstraction to do such things?
 2. Implement paging, and get the memory management in order.
 3. Figure out how to use other processors for multithreading
 4. Decide on features for a filesystem and user space and libc.
+
+Now I have the loaded the kernel in the higher half, in physical address space it looks something like this
+
+0x00000000 | this first 2 MB is for the bootloader, which we are using as GRUB
+0x00201000 | the kernel(higher half) starts from here (as you can see from the linker.ld)
+0x0020A8E0 | end of the kernel
+
+now, we need to create the page table entry and map the page directory entry to the
+page table entry. 
+
