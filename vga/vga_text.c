@@ -31,7 +31,7 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color)
 	return (uint16_t) uc | (uint16_t) color << 8;
 }
 static const size_t VGA_WIDTH = 80;
-static const size_t VGA_HEIGHT = 24;
+static const size_t VGA_HEIGHT = 25;
 
 static size_t row, column;
 static int8_t color;
@@ -49,11 +49,11 @@ static void putentryat(char c, size_t x, size_t y) {
     buffer[VGA_WIDTH*x + y] = vga_entry(c, color);
 }
 
-void init_screen(uint16_t* buffer_address) {
+void init_screen(uint32_t buffer_address) {
     row = 0;
     column = 0;
     color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-    buffer = buffer_address;
+    buffer = (uint16_t*)(buffer_address + 0xC0000000);
     clear_screen();
 }
 //TODO: make this shared in standard library

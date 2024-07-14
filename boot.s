@@ -28,7 +28,7 @@ stack_bottom:
 .skip 16384 # 16 KiB
 stack_top:
 
-.section .boot, "a"
+.section .boot, "ax"
 .global _start
 .type _start, @function
 
@@ -48,7 +48,7 @@ _start:
 	mov %ecx, %cr4
 
 	mov  %cr0, %ecx
-	or $0x80000000, %ecx
+	or $0x80000001, %ecx
 	mov  %ecx, %cr0
 
 	jmp higher_half
@@ -71,6 +71,10 @@ higher_half:
 .global initial_page_dir
 initial_page_dir:
 	// this is for the lower addressing initially
+	// also needed, in order for accessing the multiboot headers and stuff
+	// in specific, for the CPU to access the instructions, which are loaded
+	// at the bottom are needed here. 
+	// once we jump to the higher half we can invalidate this 4MB page frame
 	.long 0b10000011
 	.rept 767
 		.long 0
