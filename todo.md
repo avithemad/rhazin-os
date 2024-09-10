@@ -44,3 +44,24 @@ Now I have the loaded the kernel in the higher half, in physical address space i
 now, we need to create the page table entry and map the page directory entry to the
 page table entry. 
 
+## Aug 13 2024
+
+Till the last month we have added the following functionalities:
+1. GDT
+2. IDT
+3. Keyboard input
+4. Page table setup
+5. A very primitive framebuffer setup for modern BIOS. 
+
+Now, the next steps are
+1. Get the full 4KB paging working and map the higher half to the kernel.
+2. Add a simple file system, to transfer files to the OS. // this requires setting up a simple disk driver
+3. User space // only capability to switch from kernel to user mode
+4. Program loading // simple binaries without a link to the libc etc
+
+
+Devices that will be interacting with my OS ->
+1. Keyboard (Only input interface for the user)
+2. Screen (Only output interface for the user)
+3. Disk (For persistent storage)
+4. NIC (For connecting with the rest of the world)
